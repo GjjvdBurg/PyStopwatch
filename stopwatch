@@ -80,7 +80,7 @@ def main():
                 inp = input("Press Enter to continue...")
             stopwatch.switch()
             print(stopwatch)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, EOFError):
         if (stopwatch.state):
             stopwatch.stop()
         print()
