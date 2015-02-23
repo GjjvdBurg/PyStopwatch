@@ -4,6 +4,11 @@ from __future__ import print_function, division
 
 import datetime
 
+try:
+    input = raw_input
+except NameError:
+    pass
+
 class StopWatch(object):
     """
         The StopWatch class records the time, the state of the stopwatch and the 
