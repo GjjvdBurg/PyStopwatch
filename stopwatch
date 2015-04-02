@@ -80,6 +80,7 @@ def main():
                 inp = input("Press Enter to continue...")
             stopwatch.switch()
             print(stopwatch)
+            print("Current time is: %s" % stopwatch.time.strftime('%H:%M:%S'))
     except (KeyboardInterrupt, EOFError):
         if (stopwatch.state):
             stopwatch.stop()
