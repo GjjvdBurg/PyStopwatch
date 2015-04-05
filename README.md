@@ -3,8 +3,6 @@ PyStopwatch
 
 A very simple command line stopwatch written in Python.
 
-*Author: Gertjan van den Burg*
-
 Usage
 -----
 
@@ -27,3 +25,4 @@ something like this:
     Stopped: 00:00:03:17 seconds passed
     Stopped stopwatch at: 18:04:23
 
+A logfile is kept in the `~/.PyStopwatch` directory.
