@@ -1,0 +1,117 @@
+#!/usr/bin/env python
+
+from __future__ import print_function, division
+
+import datetime
+import os
+import sys
+
+from termcolor import colored, cprint
+
+APPNAME = 'PyStopwatch'
+
+try:
+    input = raw_input
+except NameError:
+    pass
+
+class StopWatch(object):
+    """
+        The StopWatch class records the time, the state of the stopwatch and the 
+        total number of seconds measured.
+    """
+
+    def __init__(self):
+        self.time = None
+        self.state = False
+        self.seconds = 0
+        self.logfile = self.init_logfile()
+
+    def reset(self):
+        """ Reset the state of the stopwatch """
+        self.time = None
+        self.seconds = 0
+        self.state = False
+
+    def start(self):
+        """ Start the stopwatch by recording the current time and switching the 
+        state """
+        self.time = datetime.datetime.now()
+        self.state = True
+        self.print_time()
+
+    def stop(self):
+        """ Stop the stopwatch by adding the elapsed seconds to total_seconds 
+        and switching the state """
+        diff = datetime.datetime.now() - self.time
+        self.seconds += diff.total_seconds()
+        self.time = datetime.datetime.now()
+        self.state = False
+
+    def switch(self):
+        """ Switch the state of the stopwatch """
+        if self.state:
+            self.stop()
+        else:
+            self.start()
+        print(self)
+        self.print_time()
+
+    def print_time(self):
+        print("Current time is: %s" % self.time.strftime('%H:%M:%S'))
+
+    @property
+    def logdir(self):
+        dirname = os.path.expanduser(os.path.join('~', '.' + APPNAME))
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        return dirname
+
+    def init_logfile(self):
+        now = datetime.datetime.now()
+        nowstr = now.strftime('%Y%m%d%H%M%S')
+        fname = '%s/%s.log' % (self.logdir, nowstr)
+        return open(fname, 'w')
+
+    def elapsed_str(self):
+        hours = self.seconds // 3600
+        minutes = (self.seconds - 3600*hours) // 60
+        seconds = (self.seconds % 60) // 1
+        rest = self.seconds - 3600*hours - 60*minutes - seconds
+        milli = round(rest*100.0)
+        return '%02i:%02i:%02i:%02i' % (hours, minutes, seconds, milli)
+
+    def __str__(self):
+        """ Print the current status and elapsed seconds """
+        if self.state:
+            statestr = 'Running:\t'
+            color = 'green'
+        else:
+            statestr = 'Stopped:\t'
+            color = 'red'
+        msg = '%s seconds passed' % (self.elapsed_str())
+        self.logfile.write(statestr + msg + '\n')
+        self.logfile.flush()
+        return colored(statestr, color) + msg
+
+    def __call__(self):
+        try:
+            self.start()
+            cprint('Started\n', 'green')
+            while True:
+                if (self.state):
+                    inp = input("Press Enter to pause...")
+                else:
+                    inp = input("Press Enter to continue...")
+                self.switch()
+        except (KeyboardInterrupt, EOFError):
+            if (self.state):
+                self.stop()
+            print()
+            print(self)
+        finally:
+            cprint('Stopped\n', 'red')
+            self.print_time()
+
+if __name__ == '__main__':
+    sys.exit(StopWatch()())
